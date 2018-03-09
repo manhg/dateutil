@@ -46,10 +46,9 @@ datetime module available in the Python standard library.
       python_requires=">=2.7, !=3.0.*, !=3.1.*",
       package_data={"dateutil.zoneinfo": ["dateutil-zoneinfo.tar.gz"]},
       zip_safe=True,
-      requires=["six"],
+      requires=["six","cython"],
       ext_modules = cythonize("dateutil/*.pyx"),
       setup_requires=[
-        'cython>=0.27',
         'setuptools_scm'
       ],
       install_requires=["six >=1.5"],  # XXX fix when packaging is sane again
