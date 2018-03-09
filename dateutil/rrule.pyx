@@ -1100,7 +1100,7 @@ class _iterinfo(object):
             setattr(self, attr, None)
         self.rrule = rrule
 
-    def rebuild(self, year, month):
+    def rebuild(self, int year, int month):
         # Every mask is 7 days longer to handle cross-year weekly periods.
         rr = self.rrule
         if year != self.lastyear:
