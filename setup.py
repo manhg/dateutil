@@ -5,6 +5,8 @@ import os
 import re
 
 from setuptools import setup
+from Cython.Distutils import build_ext
+from Cython.Build import cythonize
 
 
 if isfile("MANIFEST"):
@@ -32,6 +34,8 @@ datetime module available in the Python standard library.
       package_data={"dateutil.zoneinfo": ["dateutil-zoneinfo.tar.gz"]},
       zip_safe=True,
       requires=["six"],
+      requires=["six","cython"],
+      ext_modules = cythonize("dateutil/**/*.pyx"),
       install_requires=["six >=1.5"],  # XXX fix when packaging is sane again
       classifiers=[
           'Development Status :: 5 - Production/Stable',
@@ -48,5 +52,9 @@ datetime module available in the Python standard library.
           'Programming Language :: Python :: 3.5',
           'Topic :: Software Development :: Libraries',
       ],
-      test_suite="dateutil.test"
+      test_suite="dateutil.test",
+      cmdclass={
+          "test": Unsupported,
+          'build_ext': build_ext,
+      }
       )
