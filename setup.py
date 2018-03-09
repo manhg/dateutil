@@ -1,7 +1,8 @@
 #!/usr/bin/python
 from os.path import isfile
 import os
-
+from distutils.core import setup, Extension
+from Cython.Build import cythonize
 import setuptools
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
@@ -13,6 +14,7 @@ if isfile("MANIFEST"):
     os.unlink("MANIFEST")
 
 PACKAGES = find_packages(where='.', exclude=['dateutil.test'])
+PYX = [Extension("*", ["**/*.pyx"])]
 
 if LooseVersion(setuptools.__version__) <= LooseVersion("24.3"):
     warnings.warn("python_requires requires setuptools version > 24.3",
@@ -45,6 +47,7 @@ datetime module available in the Python standard library.
       package_data={"dateutil.zoneinfo": ["dateutil-zoneinfo.tar.gz"]},
       zip_safe=True,
       requires=["six"],
+      ext_modules = cythonize(PYX),
       setup_requires=['setuptools_scm'],
       install_requires=["six >=1.5"],  # XXX fix when packaging is sane again
       classifiers=[

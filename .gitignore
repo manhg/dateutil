@@ -18,3 +18,7 @@ tzdata*.tar.gz
 
 .idea
 .cache
+
+.eggs
+.pytest_cache
+*.c

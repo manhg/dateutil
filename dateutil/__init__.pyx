@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import pyximport; pyximport.install()
 try:
     from ._version import version as __version__
 except ImportError:
