@@ -1,11 +1,12 @@
 #!/usr/bin/python
 from os.path import isfile
 import os
-from distutils.core import setup, Extension
 from Cython.Build import cythonize
 import setuptools
 from setuptools import setup, find_packages
+from setuptools.extension import Extension
 from setuptools.command.test import test as TestCommand
+from Cython.Distutils import build_ext
 
 from distutils.version import LooseVersion
 import warnings
@@ -14,7 +15,6 @@ if isfile("MANIFEST"):
     os.unlink("MANIFEST")
 
 PACKAGES = find_packages(where='.', exclude=['dateutil.test'])
-PYX = [Extension("*", ["**/*.pyx"])]
 
 if LooseVersion(setuptools.__version__) <= LooseVersion("24.3"):
     warnings.warn("python_requires requires setuptools version > 24.3",
@@ -47,8 +47,29 @@ datetime module available in the Python standard library.
       package_data={"dateutil.zoneinfo": ["dateutil-zoneinfo.tar.gz"]},
       zip_safe=True,
       requires=["six"],
-      ext_modules = cythonize(PYX),
-      setup_requires=['setuptools_scm'],
+      ext_modules = [
+        Extension("*",
+            # find . -name '*.pyx'
+"""./dateutil/rrule.pyx
+./dateutil/relativedelta.pyx
+./dateutil/parser/isoparser.pyx
+./dateutil/parser/_parser.pyx
+./dateutil/parser/__init__.pyx
+./dateutil/__init__.pyx
+./dateutil/easter.pyx
+./dateutil/tz/win.pyx
+./dateutil/tz/__init__.pyx
+./dateutil/tz/_factories.pyx
+./dateutil/tz/_common.pyx
+./dateutil/tz/tz.pyx
+./dateutil/_common.pyx
+./dateutil/tzwin.pyx
+./dateutil/utils.pyx""".split("\n")),
+      ],
+      setup_requires=[
+        'cython>=0.27',
+        'setuptools_scm'
+      ],
       install_requires=["six >=1.5"],  # XXX fix when packaging is sane again
       classifiers=[
           'Development Status :: 5 - Production/Stable',
@@ -67,6 +88,7 @@ datetime module available in the Python standard library.
       ],
       test_suite="dateutil.test",
       cmdclass={
-          "test": Unsupported
+          "test": Unsupported,
+          'build_ext': build_ext,
       }
       )
