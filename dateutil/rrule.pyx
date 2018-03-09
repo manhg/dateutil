@@ -797,7 +797,7 @@ class rrule(rrulebase):
 
         total = 0
         count = self._count
-        while True:
+        while 1:
             # Get dayset with the right frequency
             dayset, start, end = getdayset(year, month, day)
 
@@ -822,7 +822,7 @@ class rrule(rrulebase):
 
             # Output results
             if bysetpos and timeset:
-                poslist = []
+                poslist = set()
                 for pos in bysetpos:
                     if pos < 0:
                         daypos, timepos = divmod(pos, len(timeset))
@@ -837,8 +837,7 @@ class rrule(rrulebase):
                     else:
                         date = datetime.date.fromordinal(ii.yearordinal+i)
                         res = datetime.datetime.combine(date, time)
-                        if res not in poslist:
-                            poslist.append(res)
+                        poslist.add(res)
                 poslist.sort()
                 for res in poslist:
                     if until and res > until:

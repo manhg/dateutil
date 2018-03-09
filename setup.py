@@ -1,12 +1,12 @@
 #!/usr/bin/python
 from os.path import isfile
 import os
-from Cython.Build import cythonize
 import setuptools
 from setuptools import setup, find_packages
 from setuptools.extension import Extension
 from setuptools.command.test import test as TestCommand
 from Cython.Distutils import build_ext
+from Cython.Build import cythonize
 
 from distutils.version import LooseVersion
 import warnings
@@ -47,25 +47,7 @@ datetime module available in the Python standard library.
       package_data={"dateutil.zoneinfo": ["dateutil-zoneinfo.tar.gz"]},
       zip_safe=True,
       requires=["six"],
-      ext_modules = [
-        Extension("*",
-            # find . -name '*.pyx'
-"""./dateutil/rrule.pyx
-./dateutil/relativedelta.pyx
-./dateutil/parser/isoparser.pyx
-./dateutil/parser/_parser.pyx
-./dateutil/parser/__init__.pyx
-./dateutil/__init__.pyx
-./dateutil/easter.pyx
-./dateutil/tz/win.pyx
-./dateutil/tz/__init__.pyx
-./dateutil/tz/_factories.pyx
-./dateutil/tz/_common.pyx
-./dateutil/tz/tz.pyx
-./dateutil/_common.pyx
-./dateutil/tzwin.pyx
-./dateutil/utils.pyx""".split("\n")),
-      ],
+      ext_modules = cythonize("dateutil/*.pyx"),
       setup_requires=[
         'cython>=0.27',
         'setuptools_scm'
