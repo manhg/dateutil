@@ -795,10 +795,14 @@ class rrule(rrulebase):
             else:
                 timeset = gettimeset(hour, minute, second)
 
-        total = 0
+        cdef int total = 0
+        cdef int MAX_TOTAL_ALLOW = 5000
         count = self._count
+        
         while 1:
             # Get dayset with the right frequency
+            if year < 2015 or year > 2050:
+                return
             dayset, start, end = getdayset(year, month, day)
 
             # Do the "hard" work ;-)
@@ -850,6 +854,8 @@ class rrule(rrulebase):
                                 self._len = total
                                 return
                         total += 1
+                        if total > MAX_TOTAL_ALLOW:
+                            return
                         yield res
             else:
                 for i in dayset[start:end]:
@@ -866,7 +872,8 @@ class rrule(rrulebase):
                                     if count < 0:
                                         self._len = total
                                         return
-
+                                if total > MAX_TOTAL_ALLOW:
+                                    return
                                 total += 1
                                 yield res
 
