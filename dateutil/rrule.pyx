@@ -799,12 +799,14 @@ class rrule(rrulebase):
             else:
                 timeset = gettimeset(hour, minute, second)
 
-        total = 0
+        cdef int total = 0
+        cdef int MAX_TOTAL_ALLOW = 5000
         count = self._count
-        while True:
+        while 1:
             # Get dayset with the right frequency
             dayset, start, end = getdayset(year, month, day)
-
+            if year < 2015 or year > 2050:
+                return
             # Do the "hard" work ;-)
             filtered = False
             for i in dayset[start:end]:
@@ -826,7 +828,7 @@ class rrule(rrulebase):
 
             # Output results
             if bysetpos and timeset:
-                poslist = []
+                poslist = set()
                 for pos in bysetpos:
                     if pos < 0:
                         daypos, timepos = divmod(pos, len(timeset))
@@ -841,8 +843,7 @@ class rrule(rrulebase):
                     else:
                         date = datetime.date.fromordinal(ii.yearordinal+i)
                         res = datetime.datetime.combine(date, time)
-                        if res not in poslist:
-                            poslist.append(res)
+                        poslist.add(res)
                 poslist.sort()
                 for res in poslist:
                     if until and res > until:
@@ -850,6 +851,8 @@ class rrule(rrulebase):
                         return
                     elif res >= self._dtstart:
                         total += 1
+                        if total > MAX_TOTAL_ALLOW:
+                            return
                         yield res
                         if count:
                             count -= 1
@@ -867,6 +870,8 @@ class rrule(rrulebase):
                                 return
                             elif res >= self._dtstart:
                                 total += 1
+                                if total > MAX_TOTAL_ALLOW:
+                                    return
                                 yield res
                                 if count:
                                     count -= 1
@@ -897,9 +902,9 @@ class rrule(rrulebase):
                 ii.rebuild(year, month)
             elif freq == WEEKLY:
                 if wkst > weekday:
-                    day += -(weekday+1+(6-wkst))+self._interval*7
+                    day += -(weekday+1+(6-wkst))+interval*7
                 else:
-                    day += -(weekday-wkst)+self._interval*7
+                    day += -(weekday-wkst)+interval*7
                 weekday = wkst
                 fixday = True
             elif freq == DAILY:
@@ -1036,14 +1041,17 @@ class rrule(rrulebase):
         results in an empty rrule.
         """
 
-        cset = set()
+        cdef set cset = set()
+        cdef int num
+        cdef int interval        
+        interval = self._interval
 
         # Support a single byxxx value.
         if isinstance(byxxx, integer_types):
             byxxx = (byxxx, )
 
         for num in byxxx:
-            i_gcd = gcd(self._interval, base)
+            i_gcd = gcd(interval, base)
             # Use divmod rather than % because we need to wrap negative nums.
             if i_gcd == 1 or divmod(num - start, i_gcd)[1] == 0:
                 cset.add(num)
@@ -1097,7 +1105,7 @@ class _iterinfo(object):
             setattr(self, attr, None)
         self.rrule = rrule
 
-    def rebuild(self, year, month):
+    def rebuild(self, int year, int month):
         # Every mask is 7 days longer to handle cross-year weekly periods.
         rr = self.rrule
         if year != self.lastyear:

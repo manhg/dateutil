@@ -33,7 +33,6 @@ datetime module available in the Python standard library.
       packages=["dateutil", "dateutil.zoneinfo", "dateutil.tz"],
       package_data={"dateutil.zoneinfo": ["dateutil-zoneinfo.tar.gz"]},
       zip_safe=True,
-      requires=["six"],
       requires=["six","cython"],
       ext_modules = cythonize("dateutil/**/*.pyx"),
       install_requires=["six >=1.5"],  # XXX fix when packaging is sane again
@@ -54,7 +53,6 @@ datetime module available in the Python standard library.
       ],
       test_suite="dateutil.test",
       cmdclass={
-          "test": Unsupported,
           'build_ext': build_ext,
       }
       )
