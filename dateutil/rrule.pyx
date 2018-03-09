@@ -753,8 +753,8 @@ class rrule(rrulebase):
 
         # Some local variables to speed things up a bit
         freq = self._freq
-        interval = self._interval
-        wkst = self._wkst
+        cdef int interval = self._interval
+        cdef int wkst = self._wkst
         until = self._until
         bymonth = self._bymonth
         byweekno = self._byweekno
@@ -900,9 +900,9 @@ class rrule(rrulebase):
                 ii.rebuild(year, month)
             elif freq == WEEKLY:
                 if wkst > weekday:
-                    day += -(weekday+1+(6-wkst))+self._interval*7
+                    day += -(weekday+1+(6-wkst))+interval*7
                 else:
-                    day += -(weekday-wkst)+self._interval*7
+                    day += -(weekday-wkst)+interval*7
                 weekday = wkst
                 fixday = True
             elif freq == DAILY:
@@ -1039,14 +1039,18 @@ class rrule(rrulebase):
         results in an empty rrule.
         """
 
-        cset = set()
+        cdef set cset = set()
+        cdef int num
+        cdef int interval
+        
+        interval = self._interval
 
         # Support a single byxxx value.
         if isinstance(byxxx, integer_types):
             byxxx = (byxxx, )
 
         for num in byxxx:
-            i_gcd = gcd(self._interval, base)
+            i_gcd = gcd(interval, base)
             # Use divmod rather than % because we need to wrap negative nums.
             if i_gcd == 1 or divmod(num - start, i_gcd)[1] == 0:
                 cset.add(num)
